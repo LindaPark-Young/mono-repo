@@ -1,9 +1,12 @@
-name: Build and deploy Next.js app to Azure Web App - fe-next
+name: Build and deploy FE Next.js app to Azure Web App - fe-next
 
 on:
-  push: # main 으로의 직접 push 와 PR 머지(=main 으로의 push) 모두 배포된다.
+  push:
     branches:
       - main
+    paths:
+      - "fe-next/**"
+      - ".github/workflows/fe.yml"
   workflow_dispatch:
 
 jobs:
@@ -11,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read # This is required for actions/checkout
+    defaults:
+      run:
+        working-directory: fe-next
 
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +26,7 @@ jobs:
         with:
           node-version: "24.x"
           cache: "npm"
+          cache-dependency-path: fe-next/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -44,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: release.zip
+          path: fe-next/release.zip
 
   deploy:
     runs-on: ubuntu-latest
